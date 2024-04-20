@@ -114,13 +114,13 @@ class RequestOutput:
         include_logprobs = seq_group.sampling_params.logprobs is not None
         text_buffer_length = seq_group.sampling_params.output_text_buffer_length
         outputs = [
-            CompletionOutput(index,
+            CompletionOutput(seqs.index(seq),
                              seq.get_output_text_to_return(text_buffer_length),
                              seq.get_output_token_ids(),
                              seq.get_cumulative_logprob(),
                              seq.output_logprobs if include_logprobs else None,
                              SequenceStatus.get_finished_reason(seq.status),
-                             seq.stop_reason) for index, seq in enumerate(top_n_seqs)
+                             seq.stop_reason) for seq in top_n_seqs
         ]
 
         # Every sequence in the sequence group should have the same prompt.
