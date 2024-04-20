@@ -265,6 +265,28 @@ async def test_single_chat_session(server, client: openai.AsyncOpenAI,
 
 
 @pytest.mark.parametrize("model_name", [MODEL_NAME])
+async def test_stream_seq_index(server, client: openai.AsyncOpenAI,
+                                 model_name: str):
+    messages = [{
+        "role": "system",
+        "content": "you are a helpful assistant"
+    }, {
+        "role": "user",
+        "content": "what is 1+1?"
+    }]
+
+    with pytest.raises((openai.BadRequestError, openai.APIError)):
+        stream = await client.completions.create(
+            model=model_name,
+            messages=messages,
+            max_tokens=20,
+            extra_body={"best_of": 4, "use_beam_search": True},
+            stream=True)
+        async for chunk in stream:
+            ...
+
+
+@pytest.mark.parametrize("model_name", [MODEL_NAME])
 async def test_too_many_logprobs(server, client: openai.AsyncOpenAI,
                                  model_name: str):
     messages = [{
